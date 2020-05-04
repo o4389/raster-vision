@@ -114,3 +114,7 @@ deployment/ansible/*.retry
 ./data
 ./notebooks
 .vscode/
+
+# Jetbrains
+*.iml
+.idea/
