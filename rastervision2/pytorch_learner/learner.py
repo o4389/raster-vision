@@ -75,7 +75,7 @@ class Learner(ABC):
         self.tmp_dir = tmp_dir
 
         # TODO make cache dirs configurable
-        torch_cache_dir = '/opt/data/torch-cache'
+        torch_cache_dir = 'TORCH_HOME' in os.environ and os.environ['TORCH_HOME'] or '/opt/data/torch-cache'
         os.environ['TORCH_HOME'] = torch_cache_dir
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
         self.data_cache_dir = '/opt/data/data-cache'

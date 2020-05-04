@@ -91,7 +91,7 @@ class PyTorchChipClassification(Backend):
         self.train_opts = train_opts
         self.inf_learner = None
 
-        torch_cache_dir = '/opt/data/torch-cache'
+        torch_cache_dir = 'TORCH_HOME' in os.environ and os.environ['TORCH_HOME'] or '/opt/data/torch-cache'
         os.environ['TORCH_HOME'] = torch_cache_dir
 
         self.model = None
