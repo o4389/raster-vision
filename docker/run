@@ -64,7 +64,7 @@ do
         ;;
         --tf-gpu)
         IMAGE="raster-vision-tf-gpu"
-        RUNTIME="--runtime=nvidia"
+        #RUNTIME="--runtime=nvidia"
         shift # past argument
         ;;
         --tf-cpu)
@@ -73,7 +73,7 @@ do
         ;;
         --pytorch-gpu)
         IMAGE="raster-vision-pytorch"
-        RUNTIME="--runtime=nvidia"
+        #RUNTIME="--runtime=nvidia"
         shift # past argument
         ;;
         --name)
