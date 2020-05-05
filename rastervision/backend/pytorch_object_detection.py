@@ -32,6 +32,8 @@ from rastervision.backend.torch_utils.object_detection.train import (
     train_epoch, validate_epoch)
 
 log = logging.getLogger(__name__)
+ENV_TORCH_HOME = 'RV_TORCH_HOME'  # Environment variable to use to set the TORCH_HOME parameter if not defined
+DEFAULT_TORCH_HOME = '/opt/data/torch-cache'
 
 
 def make_debug_chips(databunch, class_map, tmp_dir, train_uri, max_count=30):
@@ -89,9 +91,11 @@ class PyTorchObjectDetection(Backend):
         self.train_opts = train_opts
         self.inf_learner = None
 
+        # TODO make cache dirs configurable via Configs vice environment variables
         # Setup caching for torchvision pretrained models.
-        torch_cache_dir = '/opt/data/torch-cache'
-        os.environ['TORCH_HOME'] = torch_cache_dir
+        # Set a default TORCH_HOME if not already defined by the environment ('TORCH_HOME' environment variable used by PyTorch internally)
+        if 'TORCH_HOME' not in os.environ:
+            os.environ['TORCH_HOME'] = os.environ.get(ENV_TORCH_HOME, DEFAULT_TORCH_HOME)
 
         self.model = None
         self.device = 'cuda' if torch.cuda.is_available() else 'cpu'
