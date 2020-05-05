@@ -269,14 +269,15 @@ class PyTorchObjectDetection(Backend):
                 log_writer.writerow(row)
 
         # Setup Tensorboard logging.
+        tb_writer = None
+        tensorboard_process = None
         if self.train_opts.log_tensorboard:
             log_dir = join(train_dir, 'tb-logs')
             make_dir(log_dir)
             tb_writer = SummaryWriter(log_dir=log_dir)
             if self.train_opts.run_tensorboard:
                 log.info('Starting tensorboard process')
-                tensorboard_process = Popen(
-                    ['tensorboard', '--logdir={}'.format(log_dir)])
+                tensorboard_process = Popen(['tensorboard', '--logdir={}'.format(log_dir)])
                 terminate_at_exit(tensorboard_process)
 
         # Setup optimizer.
@@ -336,13 +337,14 @@ class PyTorchObjectDetection(Backend):
                 log_writer.writerow(row)
 
             # Write to Tensorboard log.
-            if self.train_opts.log_tensorboard:
+            if self.train_opts.log_tensorboard and tb_writer is not None:
                 for key, val in metrics.items():
                     tb_writer.add_scalar(key, val, epoch)
                 for key, val in train_loss.items():
                     tb_writer.add_scalar(key, val, epoch)
                 for name, param in model.named_parameters():
                     tb_writer.add_histogram(name, param, epoch)
+                tb_writer.flush()
 
             if (train_uri.startswith('s3://')
                     and (((epoch + 1) % self.train_opts.sync_interval) == 0)):
@@ -350,8 +352,9 @@ class PyTorchObjectDetection(Backend):
 
         # Close Tensorboard.
         if self.train_opts.log_tensorboard:
-            tb_writer.close()
-            if self.train_opts.run_tensorboard:
+            if tb_writer is not None:
+                tb_writer.close()
+            if self.train_opts.run_tensorboard and tensorboard_process is not None:
                 tensorboard_process.terminate()
 
         # Mark that the command has completed.
